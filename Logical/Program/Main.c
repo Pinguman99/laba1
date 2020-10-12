@@ -10,24 +10,24 @@ unsigned long bur_heap_size = 0xFFFF;
 
 void _INIT ProgramInit(void)
 {
-	fb_motor.dt=0.0001;
-	fb_motor.ke=2;
-	fb_motor.Tm=0.4;
-	fb_motor.integrator.dt=0.0001;
-
-	fb_motor2.dt=0.0001;
-	fb_motor2.ke=2;
-	fb_motor2.Tm=0.4;
-	fb_motor2.integrator.dt=0.0001;
+	fb_motor.dt=0.01;
+	fb_motor.ke=16;
+	fb_motor.Tm=0.04;
 	
-	fb_regulator.dt=0.0001;
-	fb_regulator.k_p=8;
-	fb_regulator.k_i=20;
+
+	fb_motor2.dt=0.01;
+	fb_motor2.ke=16;
+	fb_motor2.Tm=0.04;
+	
+	
+	fb_regulator.dt=0.01;
+	fb_regulator.k_p=0.64;
+	fb_regulator.k_i=16;
 	fb_regulator.max_abs_value=24;
-	fb_regulator.integrator.dt=0.0001;
 	
 	enable=1;
 	count=0;
+	speed = 0;
 
 }
 
@@ -50,12 +50,12 @@ void _CYCLIC ProgramCyclic(void)
 			}
 		}
 	}
-	fb_regulator.e=speed - fb_motor.w;
-	fb_motor2.u=speed;
-	FB_Regulator(&fb_regulator);
-	fb_motor.u=fb_regulator.u;
-	FB_Motor(&fb_motor);
-	FB_Motor(&fb_motor2);
+	fb_regulator.e = speed - fb_motor.w;
+	FB_Regulator(&(fb_regulator));
+	fb_motor.u = fb_regulator.u*fb_motor.ke;
+	fb_motor2.u = speed*fb_motor2.ke;
+	FB_Motor(&(fb_motor));
+	FB_Motor(&(fb_motor2));
 
 }
 
